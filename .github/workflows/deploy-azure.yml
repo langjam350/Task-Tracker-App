@@ -42,7 +42,7 @@ jobs:
         path: ${{ env.PROJECT_PATH }}/TestResults/*.trx
     
     - name: Publish
-      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+      run: dotnet publish -c Release -o ${{github.workspace}}/myapp
       working-directory: ${{ env.PROJECT_PATH }}
     
     - name: Debug - List publish output
@@ -51,10 +51,10 @@ jobs:
         ls -la ${{github.workspace}}/
         echo "---"
         echo "Contents of myapp directory:"
-        ls -la ${{github.workspace}}/myapp/
+        ls -la ${{github.workspace}}/myapp/ || echo "myapp directory not found!"
         echo "---"
         echo "DLL files in myapp:"
-        find ${{github.workspace}}/myapp/ -name "*.dll"
+        find ${{github.workspace}}/myapp/ -name "*.dll" || echo "No DLL files found"
     
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
