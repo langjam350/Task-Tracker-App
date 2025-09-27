@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: your-task-api    # Replace with your app name
+  AZURE_WEBAPP_NAME: TaskTrackerApp    # Replace with your app name
   AZURE_WEBAPP_PACKAGE_PATH: '.'
   DOTNET_VERSION: '8.0.x'             # Match your .NET version
 
