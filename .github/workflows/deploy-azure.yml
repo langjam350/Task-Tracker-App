@@ -45,7 +45,16 @@ jobs:
       run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
       working-directory: ${{ env.PROJECT_PATH }}
     
-
+    - name: Debug - List publish output
+      run: |
+        echo "Checking if myapp directory exists..."
+        ls -la ${{github.workspace}}/
+        echo "---"
+        echo "Contents of myapp directory:"
+        ls -la ${{github.workspace}}/myapp/
+        echo "---"
+        echo "DLL files in myapp:"
+        find ${{github.workspace}}/myapp/ -name "*.dll"
     
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
