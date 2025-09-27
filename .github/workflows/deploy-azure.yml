@@ -9,7 +9,7 @@ on:
 env:
   AZURE_WEBAPP_NAME: TaskTrackerApp.API.NETCore    # Replace with your app name
   AZURE_WEBAPP_PACKAGE_PATH: '.'
-  DOTNET_VERSION: '8.x'             # Match your .NET version
+  DOTNET_VERSION: '8.0.x'             # Match your .NET version
 
 jobs:
   build-and-deploy:
@@ -30,8 +30,16 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
 
-    - name: Test (optional)
-      run: dotnet test --no-restore --verbosity normal
+    - name: Run Tests
+      run: dotnet test --configuration Release --no-restore --verbosity normal --logger trx --results-directory ./TestResults
+
+    - name: Publish Test Results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Test Results
+        path: ./TestResults/*.trx
+        reporter: dotnet-trx
 
     - name: Publish
       run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
