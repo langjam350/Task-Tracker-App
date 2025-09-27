@@ -10,6 +10,7 @@ env:
   AZURE_WEBAPP_NAME: TaskTrackerApp.API.NETCore    # Replace with your app name
   AZURE_WEBAPP_PACKAGE_PATH: '.'
   DOTNET_VERSION: '8.x'             # Match your .NET version
+  PROJECT_PATH: './TaskTrackerApp/TaskTrackerApp.API.NETCore'
 
 jobs:
   build-and-deploy:
