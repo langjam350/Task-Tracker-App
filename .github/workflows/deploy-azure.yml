@@ -45,21 +45,16 @@ jobs:
       run: dotnet publish -c Release -o ${{github.workspace}}/myapp
       working-directory: ${{ env.PROJECT_PATH }}
     
-    - name: Debug - List publish output
-      run: |
-        echo "Checking if myapp directory exists..."
-        ls -la ${{github.workspace}}/
-        echo "---"
-        echo "Contents of myapp directory:"
-        ls -la ${{github.workspace}}/myapp/ || echo "myapp directory not found!"
-        echo "---"
-        echo "DLL files in myapp:"
-        find ${{github.workspace}}/myapp/ -name "*.dll" || echo "No DLL files found"
-    
+    - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.__clientidsecretname__ }}
+          tenant-id: ${{ secrets.__tenantidsecretname__ }}
+          subscription-id: ${{ secrets.__subscriptionidsecretname__ }}
+
     - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ${{github.workspace}}/myapp
-        slot-name: 
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'TaskTrackerApp'
+          slot-name: 'Production'
+          package: .
