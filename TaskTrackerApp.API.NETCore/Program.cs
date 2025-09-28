@@ -1,6 +1,7 @@
 using TaskTrackerApp.API.NETCore.DAL;
 using TaskTrackerApp.API.NETCore.Service;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.SpaServices.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
