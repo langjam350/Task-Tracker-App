@@ -1,0 +1,69 @@
+<div class="task-app">
+  <header class="app-header">
+    <h1>{{ title() }}</h1>
+  </header>
+
+  <main class="main-content">
+    @if (isLoading()) {
+      <div class="loading">Loading tasks...</div>
+    } @else {
+      <div class="task-section">
+        <div class="task-list-header">
+          <h2>Your Tasks</h2>
+          <button class="add-task-btn" (click)="showAddTask()">
+            Add Task
+          </button>
+        </div>
+
+        @if (tasks().length === 0) {
+          <div class="no-tasks">
+            <p>No Tasks Available</p>
+            <p class="no-tasks-subtitle">Click "Add Task" to create your first task!</p>
+          </div>
+        } @else {
+          <div class="task-list">
+            @for (task of tasks(); track task.id) {
+              <div class="task-item" [class.completed]="task.isCompleted">
+                <div class="task-content">
+                  <span class="task-title">{{ task.title }}</span>
+                  @if (task.isCompleted) {
+                    <span class="task-status completed">✓ Completed</span>
+                  } @else {
+                    <span class="task-status pending">Pending</span>
+                  }
+                </div>
+                @if (task.isCompleted) {
+                  <button class="completed-btn" disabled>
+                    ✓ Completed
+                  </button>
+                } @else {
+                  <button
+                    class="complete-btn"
+                    (click)="toggleTaskCompletion(task)"
+                    title="Mark as complete"
+                  >
+                    Complete
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </main>
+
+  <!-- Add Task Modal Overlay -->
+  @if (showAddTaskCard()) {
+    <div class="modal-overlay" (click)="hideAddTask()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <app-add-task-card
+          (taskAdded)="onTaskAdded($event)"
+          (cancelled)="hideAddTask()"
+        ></app-add-task-card>
+      </div>
+    </div>
+  }
+</div>
+
+<router-outlet />

@@ -1,5 +1,5 @@
 # .github/workflows/deploy-azure.yml
-name: Deploy API to Azure
+name: Deploy Full Stack App to Azure
 on:
   push:
     branches: [ main ]
@@ -8,43 +8,71 @@ env:
   AZURE_WEBAPP_NAME: TaskTrackerApp    # Replace with your app name
   AZURE_WEBAPP_PACKAGE_PATH: '.'
   DOTNET_VERSION: '8.0.x'             # Match your .NET version
-  PROJECT_PATH: './TaskTrackerApp.API.NETCore'
+  NODE_VERSION: '20.x'                # Node.js version for Angular
+  API_PROJECT_PATH: './TaskTrackerApp.API.NETCore'
+  UI_PROJECT_PATH: './TaskTrackerApp.UI.ReactAngular'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
+    # Setup Node.js for Angular
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: ${{ env.UI_PROJECT_PATH }}/package-lock.json
+
+    # Setup .NET for API
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-    
-    - name: Restore dependencies
+
+    # Build Angular Frontend
+    - name: Install Angular dependencies
+      run: npm ci
+      working-directory: ${{ env.UI_PROJECT_PATH }}
+
+    - name: Build Angular app
+      run: npm run build
+      working-directory: ${{ env.UI_PROJECT_PATH }}
+
+    # Copy Angular build to API wwwroot
+    - name: Copy Angular build to API
+      run: |
+        mkdir -p ${{ env.API_PROJECT_PATH }}/wwwroot
+        cp -r ${{ env.UI_PROJECT_PATH }}/dist/TaskTrackerApp.UI.ReactAngular/browser/* ${{ env.API_PROJECT_PATH }}/wwwroot/
+
+    # Build and Test .NET API
+    - name: Restore .NET dependencies
       run: dotnet restore
-      working-directory: ${{ env.PROJECT_PATH }}
-    
-    - name: Build
+      working-directory: ${{ env.API_PROJECT_PATH }}
+
+    - name: Build .NET API
       run: dotnet build --configuration Release --no-restore
-      working-directory: ${{ env.PROJECT_PATH }}
-    
+      working-directory: ${{ env.API_PROJECT_PATH }}
+
     - name: Run Tests
       run: dotnet test --configuration Release --no-restore --verbosity normal --logger trx --results-directory ./TestResults
-      working-directory: ${{ env.PROJECT_PATH }}
-    
+      working-directory: ${{ env.API_PROJECT_PATH }}
+
     - name: Upload Test Results
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results
-        path: ${{ env.PROJECT_PATH }}/TestResults/*.trx
-    
-    - name: Publish
+        path: ${{ env.API_PROJECT_PATH }}/TestResults/*.trx
+
+    # Publish the combined app
+    - name: Publish .NET API with Angular
       run: dotnet publish -c Release -o ${{github.workspace}}/myapp
-      working-directory: ${{ env.PROJECT_PATH }}
-    
+      working-directory: ${{ env.API_PROJECT_PATH }}
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
