@@ -26,19 +26,19 @@ namespace TaskTrackerApp.API.NETCore.Service
          * title (string): Title of task to add
          * Returns boolean detailing add status
          */
-        public bool AddTask(string title)
+        public async Task<bool> AddTaskAsync(string title)
         {
-            return _tasks.AddTaskToRepository(title);
-            
+            return await _tasks.AddTaskToRepositoryAsync(title);
+
         }
 
         /**
          * Gets all tasks from Repository
          * Returns list of TaskItems
          */
-        public List<TaskItem> GetAllTasks()
+        public async Task<List<TaskItem>> GetAllTasksAsync()
         {
-            return _tasks.GetAllItems();
+            return await _tasks.GetAllItemsAsync();
         }
 
         /**
@@ -46,10 +46,10 @@ namespace TaskTrackerApp.API.NETCore.Service
          * taskId (int): Task ID to complete
          * Returns boolean detailing completed status
          */
-        public bool CompleteTask(int taskId)
+        public async Task<bool> CompleteTaskAsync(int taskId)
         {
-            return _tasks.CompleteTask(taskId);
-            
+            return await _tasks.CompleteTaskAsync(taskId);
+
         }
     }
 }

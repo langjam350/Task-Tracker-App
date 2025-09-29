@@ -4,10 +4,10 @@ namespace TaskTrackerApp.API.NETCore.DAL
 {
     public interface ITaskRepository
     {
-        List<TaskItem> GetAllItems();
+        Task<List<TaskItem>> GetAllItemsAsync();
 
-        bool AddTaskToRepository(string title);
+        Task<bool> AddTaskToRepositoryAsync(string title);
 
-        bool CompleteTask(int taskId);
+        Task<bool> CompleteTaskAsync(int taskId);
     }
 }

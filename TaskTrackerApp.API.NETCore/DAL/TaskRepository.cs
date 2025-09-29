@@ -14,8 +14,8 @@ namespace TaskTrackerApp.API.NETCore.DAL
          * Method to recieve all task items from memory
          * Returns list of task items
          */
-        public List<TaskItem> GetAllItems() {
-            return m_tasks;
+        public async Task<List<TaskItem>> GetAllItemsAsync() {
+            return await Task.FromResult(m_tasks);
         }
 
         /**
@@ -23,13 +23,15 @@ namespace TaskTrackerApp.API.NETCore.DAL
          * title (string): Title of task to add
          * Returns boolean if task added successfully
          */
-        public bool AddTaskToRepository(string title) {
+        public async Task<bool> AddTaskToRepositoryAsync(string title) {
             TaskItem item = new TaskItem(title);
-            lock (_lock) {
-                var id = m_tasks.Count + 1;
-                item.Id = id;
-                m_tasks.Add(item);
-            }
+            await Task.Run(() => {
+                lock (_lock) {
+                    var id = m_tasks.Count + 1;
+                    item.Id = id;
+                    m_tasks.Add(item);
+                }
+            });
 
             return true;
         }
@@ -39,18 +41,19 @@ namespace TaskTrackerApp.API.NETCore.DAL
          * taskId (int): Task ID to complete
          * Returns boolean if task completed successfully
          */
-        public bool CompleteTask(int taskId) {
-            lock (_lock) {
-                var taskToComplete = m_tasks.FirstOrDefault(t => t.Id == taskId);
+        public async Task<bool> CompleteTaskAsync(int taskId) {
+            return await Task.Run(() => {
+                lock (_lock) {
+                    var taskToComplete = m_tasks.FirstOrDefault(t => t.Id == taskId);
 
-                if (taskToComplete == null) {
-                    return false;
+                    if (taskToComplete == null) {
+                        return false;
+                    }
+
+                    taskToComplete.IsCompleted = true;
+                    return true;
                 }
-
-                taskToComplete.IsCompleted = true;
-            }
-
-            return true;
+            });
         }
     }
 }

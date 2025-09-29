@@ -26,32 +26,32 @@ namespace TaskTrackerApp.API.NETCore.Controller
          * Returns list of all TaskItems
          */
         [HttpGet]
-        public ActionResult GetAllTasks()
+        public async Task<ActionResult> GetAllTasks()
         {
             // Get All Tasks from task service
-            var tasks = _taskService.GetAllTasks();
+            var tasks = await _taskService.GetAllTasksAsync();
 
             // Return 200 with task list if present and 404 if tasks are missing
             return Ok(tasks);
         }
 
         [HttpPost]
-        public ActionResult AddTask([FromBody] CreateTaskRequest request)
+        public async Task<ActionResult> AddTask([FromBody] CreateTaskRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Title))
             {
                 return BadRequest(new { message = "Title is required" });
             }
 
-            var result = _taskService.AddTask(request.Title);
+            var result = await _taskService.AddTaskAsync(request.Title);
             return result ? Ok() : BadRequest();
         }
 
         [HttpPut("{id}/complete")]
-        public ActionResult CompleteTask([FromRoute(Name = "id")] int taskId) 
+        public async Task<ActionResult> CompleteTask([FromRoute(Name = "id")] int taskId)
         {
             // Complete task using task service implementation
-            var result = _taskService.CompleteTask(taskId);
+            var result = await _taskService.CompleteTaskAsync(taskId);
 
             // Return 200 upon successful completion and 404 if the task is not found
             return result ? Ok() : NotFound();
