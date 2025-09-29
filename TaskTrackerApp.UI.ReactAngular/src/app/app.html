@@ -2,9 +2,10 @@
   <header class="app-header">
     <h1>{{ title() }}</h1>
   </header>
-
+  
   <main class="main-content">
     @if (isLoading()) {
+      <div class="spinner"></div>
       <div class="loading">Loading tasks...</div>
     } @else {
       <div class="task-section">
